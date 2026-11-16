@@ -1,0 +1,16 @@
+import { Outlet, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import NavBar from './NavBar'
+import Footer from '../home/Footer'
+
+export default function AppShell() {
+  const { pathname } = useLocation()
+  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  return (
+    <div className="flex min-h-screen flex-col">
+      <NavBar />
+      <main className="flex-1"><Outlet /></main>
+      <Footer />
+    </div>
+  )
+}

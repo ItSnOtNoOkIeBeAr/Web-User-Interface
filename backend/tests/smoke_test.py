@@ -1,0 +1,20 @@
+from fastapi.testclient import TestClient
+from app.main import app
+c = TestClient(app)
+S = "samples/"
+def f(n): return open(S+n,"rb")
+print(c.get("/api/health").json())
+print(list(c.post("/api/lab1/info", files={"file": f("cat.jpg")}).json().items()))
+print(c.post("/api/lab1/crop", files={"file": f("cat.jpg")}).json()["shape"])
+print(c.post("/api/lab2/edges", files={"file": f("cat.jpg")}).json()["canny_pixels"])
+r=c.post("/api/lab3/equalize", files={"file": f("dark.jpg")}).json(); print(r["stats"])
+print(c.post("/api/lab3/color", files={"file": f("dark.jpg")}).status_code, c.post("/api/lab3/stretch", files={"file": f("dark.jpg")}).status_code)
+r=c.post("/api/lab4/match", files={"img1": f("astronaut.jpg")}, data={"detector":"surf"}).json(); print(r["used"], r["notice"][:30], r["race"], r["total_matches"])
+r=c.post("/api/lab4/keypoints", files={"file": f("astronaut.jpg")}, data={"upright":"true"}).json(); print(r["counts"], r["notice"][:40])
+r=c.post("/api/lab7/classic", files={"file": f("coins.png"), "gt": f("coins_gt_mask.png")}).json(); print(r["iou"], r["extra"])
+r=c.post("/api/lab7/region-grow", files={"file": f("coins.png")}, data={"x":0.5,"y":0.1}).json(); print(r["steps"], r["area_percent"])
+print(c.post("/api/lab1/info", files={"file": ("x.txt", b"hello")}).status_code)
+r=c.post("/api/lab6/detect", files={"file": f("cat.jpg")}); print(r.status_code, r.text[:300])
+r=c.post("/api/lab7/deeplab", files={"file": f("cat.jpg")}); print(r.status_code, r.text[:100] if r.status_code!=200 else r.json()["classes"])
+r=c.post("/api/lab6/label-viz", files={"image": f("cat.jpg"),"labels":f("cat_labels.txt")}, data={"names":"cat"}); print(r.status_code)
+r=c.post("/api/live/frame", files={"file": f("cat.jpg")}, data={"effect":"keypoints"}); print(r.status_code)
