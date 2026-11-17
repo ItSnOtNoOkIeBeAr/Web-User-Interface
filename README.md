@@ -114,3 +114,10 @@ cloudflared tunnel --url http://localhost:8000  # expose it
 
 Override locations with `JAYPEE_BACKEND_DIR`, `JAYPEE_BACKEND_URL`, `MATTHEW_BACKEND_URL`.
 In dev, `npm run dev` proxies `/api`, `/samples` and `/jaypee` to the gateway on :8000.
+
+### Public address
+
+The app is published through a Cloudflare Tunnel at **https://cv.dhekode.com** (tunnel `comvision-web-ui`, route → `http://localhost:8000`).
+- Your app: `/` · health of both backends: `/gateway/status` · Jaypee's API: `/jaypee/docs`
+- A frontend hosted elsewhere should use `VITE_API_BASE=https://cv.dhekode.com`; Jaypee's frontend should use `VITE_API_BASE=https://cv.dhekode.com/jaypee`.
+- Run the tunnel with `cloudflared tunnel run --token <token>` (the token is in the Cloudflare dashboard; do not commit it).
