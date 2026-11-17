@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { apiUrl } from '../../api/base'
 
 // Real outputs produced by the backend labs (see backend/make_samples.py -> samples/previews).
 const SLIDES = [
-  { src: '/samples/previews/canny.png', label: 'Canny edges', lab: 2 },
-  { src: '/samples/previews/yolo.png', label: 'YOLO boxes', lab: 6 },
-  { src: '/samples/previews/pca_k3.png', label: 'PCA rebuild · 3 components', lab: 5 },
-  { src: '/samples/previews/pca_k60.png', label: 'PCA rebuild · 60 components', lab: 5 },
-  { src: '/samples/previews/deeplab.png', label: 'Segmentation masks', lab: 7 },
+  { src: apiUrl('/samples/previews/canny.png'), label: 'Canny edges', lab: 2 },
+  { src: apiUrl('/samples/previews/yolo.png'), label: 'YOLO boxes', lab: 6 },
+  { src: apiUrl('/samples/previews/pca_k3.png'), label: 'PCA rebuild · 3 components', lab: 5 },
+  { src: apiUrl('/samples/previews/pca_k60.png'), label: 'PCA rebuild · 60 components', lab: 5 },
+  { src: apiUrl('/samples/previews/deeplab.png'), label: 'Segmentation masks', lab: 7 },
 ]
 
 /** Animated hero: cycles through real demo outputs. */

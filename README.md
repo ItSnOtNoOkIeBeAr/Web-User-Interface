@@ -93,3 +93,24 @@ frontend/src/
 ## Screenshots
 
 Add screenshots here after running the app (e.g. `docs/home.png`, `docs/lab2.png`).
+
+## Main API (gateway) + Jaypee's backend
+
+`gateway/main.py` is the single public entry point (put Cloudflare Tunnel in front of it). It forwards:
+
+| Path | Goes to |
+|---|---|
+| `/api/*`, `/samples/*` | this project's backend (`:8001`) |
+| `/jaypee/*` (prefix stripped, e.g. `/jaypee/api/lab2/run`) | Jaypee's backend, `../Comvision-web-ui/backend` (`:8002`) |
+| `/gateway/status` | health of both backends |
+| anything else | built frontend (`frontend/dist`) |
+
+The two backends both contain a Python package named `app`, so they run as separate processes.
+
+```powershell
+.\run_all.ps1                                   # starts :8001, :8002 and the gateway on :8000
+cloudflared tunnel --url http://localhost:8000  # expose it
+```
+
+Override locations with `JAYPEE_BACKEND_DIR`, `JAYPEE_BACKEND_URL`, `MATTHEW_BACKEND_URL`.
+In dev, `npm run dev` proxies `/api`, `/samples` and `/jaypee` to the gateway on :8000.

@@ -7,6 +7,7 @@ import { ErrorNote } from '../playground/Status'
 import ToolkitItem from '../playground/ToolkitItem'
 import ToolkitPanel from '../playground/ToolkitPanel'
 import { sampleFile } from '../../api/client'
+import { apiUrl } from '../../api/base'
 
 const YAML = `# data.yaml
 path: ../datasets/my_dataset   # dataset root
@@ -83,7 +84,7 @@ function LabelViz() {
   const [err, setErr] = useState<string | null>(null)
   const demo = async () => {
     setImg(await sampleFile('cat.jpg'))
-    setTxt(new File([await (await fetch('/samples/cat_labels.txt')).blob()], 'cat_labels.txt'))
+    setTxt(new File([await (await fetch(apiUrl('/samples/cat_labels.txt'))).blob()], 'cat_labels.txt'))
     setNames('cat')
   }
   return <>

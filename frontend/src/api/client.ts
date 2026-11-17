@@ -1,5 +1,7 @@
 // Tiny fetch helpers shared by every lab's API client.
 
+import { apiUrl } from './base'
+
 type Field = string | number | boolean | Blob | undefined | null
 
 async function parse<T>(res: Response): Promise<T> {
@@ -20,7 +22,7 @@ export async function postForm<T>(path: string, fields: Record<string, Field>, s
     else fd.append(k, String(v))
   }
   try {
-    return await parse<T>(await fetch(`/api${path}`, { method: 'POST', body: fd, signal }))
+    return await parse<T>(await fetch(apiUrl(`/api${path}`), { method: 'POST', body: fd, signal }))
   } catch (e) {
     if (e instanceof TypeError) throw new Error('Cannot reach the backend. Start it with: uvicorn app.main:app --reload')
     throw e
@@ -29,7 +31,7 @@ export async function postForm<T>(path: string, fields: Record<string, Field>, s
 
 export async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
   try {
-    return await parse<T>(await fetch(`/api${path}`, { signal }))
+    return await parse<T>(await fetch(apiUrl(`/api${path}`), { signal }))
   } catch (e) {
     if (e instanceof TypeError) throw new Error('Cannot reach the backend. Start it with: uvicorn app.main:app --reload')
     throw e
@@ -38,7 +40,7 @@ export async function getJson<T>(path: string, signal?: AbortSignal): Promise<T>
 
 /** Load a bundled sample from /samples as a File so it can be uploaded like any user image. */
 export async function sampleFile(name: string): Promise<File> {
-  const res = await fetch(`/samples/${name}`)
+  const res = await fetch(apiUrl(`/samples/${name}`))
   if (!res.ok) throw new Error(`Sample ${name} not found. Run backend/make_samples.py`)
   const blob = await res.blob()
   return new File([blob], name, { type: blob.type })
