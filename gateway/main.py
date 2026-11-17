@@ -13,7 +13,8 @@ from pathlib import Path
 
 import httpx
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, StreamingResponse
 
 MINE = os.getenv("MATTHEW_BACKEND_URL", "http://127.0.0.1:8001").rstrip("/")
 JAYPEE = os.getenv("JAYPEE_BACKEND_URL", "http://127.0.0.1:8002").rstrip("/")
@@ -49,6 +50,28 @@ async def status():
         except Exception as e:
             return {"name": name, "url": base, "up": False, "error": type(e).__name__}
     return {"matthew": await ping("matthew", MINE), "jaypee": await ping("jaypee", JAYPEE)}
+
+
+@app.get("/jaypee")
+async def jaypee_root():
+    """Jaypee's backend has no home page; send visitors to its API docs."""
+    return RedirectResponse("/jaypee/docs")
+
+
+@app.get("/jaypee/openapi.json", include_in_schema=False)
+async def jaypee_openapi():
+    """Jaypee's schema with `servers` set to /jaypee so Swagger's "Try it out" calls his backend."""
+    try:
+        schema = (await client.get(f"{JAYPEE}/openapi.json", timeout=10)).json()
+    except Exception:
+        return JSONResponse({"detail": "Jaypee's backend is not reachable. Is it running?"}, status_code=502)
+    schema["servers"] = [{"url": "/jaypee"}]
+    return schema
+
+
+@app.get("/jaypee/docs", include_in_schema=False)
+async def jaypee_docs():
+    return get_swagger_ui_html(openapi_url="/jaypee/openapi.json", title="Jaypee's API (CV Lab Workbench)")
 
 
 @app.api_route("/jaypee/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
